@@ -1,22 +1,26 @@
 import { configureStore, ThunkAction, Action, combineReducers, getDefaultMiddleware } from '@reduxjs/toolkit';
 import { createBrowserHistory } from 'history'
-import counterReducer from '../features/counter/counterSlice';
+import typerReducer from '../features/typer/typerSlice';
 import { connectRouter, routerMiddleware } from 'connected-react-router';
+import createSagaMiddleware from 'redux-saga'
+import rootSaga from './rootSaga'
 
 const createRootReducer = (history: any) => combineReducers({
   router: connectRouter(history),
-  counter: counterReducer,
+  typer: typerReducer,
 })
-
 export const history = createBrowserHistory()
 
-const middlewares = [routerMiddleware(history)];
+const sagaMiddleware = createSagaMiddleware()
+const routerMid = routerMiddleware(history)
 
 export const store = configureStore({
   reducer: createRootReducer(history),
-  middleware: [...getDefaultMiddleware(), ...middlewares],
+  middleware: [...getDefaultMiddleware(), sagaMiddleware,routerMid],
   devTools: true
 });
+
+sagaMiddleware.run(rootSaga)
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppThunk<ReturnType = void> = ThunkAction<

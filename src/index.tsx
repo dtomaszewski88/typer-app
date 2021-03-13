@@ -11,7 +11,6 @@ import { history } from './app/store';
 
 
 ReactDOM.render(
-  <React.StrictMode>
     <Provider store={store}>
       <ConnectedRouter history={history}> { /* place ConnectedRouter under Provider */ }
         <> { /* your usual react-router v4/v5 routing */ }
@@ -21,8 +20,7 @@ ReactDOM.render(
           </Switch>
         </>
       </ConnectedRouter>
-    </Provider>
-  </React.StrictMode>,
+    </Provider>,
   document.getElementById('root')
 );
 
