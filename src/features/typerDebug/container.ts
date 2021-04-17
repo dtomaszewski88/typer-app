@@ -1,5 +1,5 @@
 import { connect } from 'react-redux'
-import Typer from './Typer'
+import TyperDebug from './TyperDebug'
 import {
     getLocalText,
     updateLocalTextGuarded,
@@ -9,17 +9,17 @@ import {
     getCountDown,
     countDownInit,
     getErrors,
-    getStatus,
     getErrorTime,
     getRemainingWords,
-} from './typerSlice'
+    getStatus,
+} from '../typer/typerSlice'
 
 const mapStateToProps = (state: any) => ({
     localText: getLocalText(state),
     remoteText: getRemoteText(state),
     currentWord: getCurrentWord(state),
-    errors: getErrors(state),
     status: getStatus(state),
+    errors: getErrors(state),
     errorTime: getErrorTime(state),
     score: getScore(state),
     countDown: getCountDown(state),
@@ -30,4 +30,4 @@ const mapDispatchToProps = {
     countDownInit,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Typer)
+export default connect(mapStateToProps, mapDispatchToProps)(TyperDebug)

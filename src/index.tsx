@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import './index.scss';
+import AppContainer from './container';
 import { store } from './app/store';
 import { Provider } from 'react-redux';
 import * as serviceWorker from './serviceWorker';
@@ -15,7 +15,7 @@ ReactDOM.render(
       <ConnectedRouter history={history}> { /* place ConnectedRouter under Provider */ }
         <> { /* your usual react-router v4/v5 routing */ }
           <Switch>
-            <Route component={App} exact path="/"/>
+            <Route component={AppContainer} exact path="/"/>
             <Route render={() => (<div>Miss</div>)} />
           </Switch>
         </>

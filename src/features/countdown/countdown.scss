@@ -1,0 +1,25 @@
+.count-down-wrapper {
+    padding-top: 10rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.countdown-text {
+    font-size: 7rem;
+    line-height: 7rem;
+}
+.countdown {
+    &-appear {
+        transition: opacity 1000ms ease-in, transform 1000ms ease-in;
+        transform: scale(1);
+        opacity: 1;
+    }
+    &-appear-active {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+    &-appear-done {
+        transform: scale(1.5);
+        opacity: 0;
+    }
+}
