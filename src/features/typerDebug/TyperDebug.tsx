@@ -78,18 +78,6 @@ const TyperDebug = ({
                 <h1>Current Word: {currentWord}</h1>
                 <h1>Local Text: {localText}</h1>
                 <h1>Remote Text: {remoteText}</h1>
-                {/* <InputGroup className="mb-3">
-      <InputGroup.Prepend>
-        <InputGroup.Text id="basic-addon1">@</InputGroup.Text>
-      </InputGroup.Prepend>
-        <FormControl
-        value={localText}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange(e)}
-        placeholder="Username"
-        aria-label="Username" 
-        aria-describedby="basic-addon1"
-      />
-      </InputGroup> */}
             </Container>
             <Container>
                 <Button variant="primary" onClick={handleConnect}>

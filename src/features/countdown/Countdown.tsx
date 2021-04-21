@@ -1,8 +1,6 @@
 import React from 'react'
-import { InputGroup, FormControl, Container, Button } from 'react-bootstrap'
+import { Container } from 'react-bootstrap'
 import { CSSTransition } from 'react-transition-group'
-import { getLocalText } from '../typer/typerSlice'
-import { map } from 'lodash'
 import './countdown.scss'
 
 interface Props {
