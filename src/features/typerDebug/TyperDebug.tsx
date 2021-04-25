@@ -1,5 +1,11 @@
 import React from 'react'
-import { InputGroup, FormControl, Container, Button } from 'react-bootstrap'
+import {
+    InputGroup,
+    FormControl,
+    Container,
+    Button,
+    ButtonGroup,
+} from 'react-bootstrap'
 import { CSSTransition } from 'react-transition-group'
 import { map } from 'lodash'
 
@@ -68,35 +74,19 @@ const TyperDebug = ({
         </div>
     )
     return (
-        <>
-            <Container>
-                <h1>Count Down: {countDown}</h1>
-                <h1>Status: {status}</h1>
-                <h1>Score: {score}</h1>
-                <h1>Errors: {errors}</h1>
-                <h1>Error Time: {errorTime}</h1>
-                <h1>Current Word: {currentWord}</h1>
-                <h1>Local Text: {localText}</h1>
-                <h1>Remote Text: {remoteText}</h1>
-            </Container>
-            <Container>
+        <Container>
+            <ButtonGroup aria-label="Basic example">
                 <Button variant="primary" onClick={handleConnect}>
                     Connect
-                </Button>{' '}
+                </Button>
                 <Button variant="secondary" onClick={handleAddToQueue}>
                     Add To queue
-                </Button>{' '}
+                </Button>
                 <Button variant="success" onClick={handleReady}>
                     Ready
-                </Button>{' '}
-            </Container>
-
-            <Container>
-                {map(remainingWords, (word: string) => {
-                    return <h2 key={word}>{word}</h2>
-                })}
-            </Container>
-        </>
+                </Button>
+            </ButtonGroup>
+        </Container>
     )
 }
 export default TyperDebug

@@ -7,35 +7,18 @@ import classNames from 'classnames'
 import Score from '../score/container'
 import './typer.scss'
 
-declare type FormControlElement =
-    | HTMLInputElement
-    | HTMLSelectElement
-    | HTMLTextAreaElement
 interface Props {
-    countDown: number
-    score: number
     errorTime: number
-    errors: number
     localText: string
-    status: string
-    remoteText: string
     currentWord: string | undefined
     remainingWords: [string?]
-    updateLocalText: (arg1: string) => void
-    countDownInit: (arg1: number) => void
 }
 
 const Typer = ({
-    score,
-    errors,
     errorTime,
-    countDown,
     localText,
-    remoteText,
     currentWord,
     remainingWords,
-    updateLocalText,
-    countDownInit,
 }: Props) => {
     const promptLetters = currentWord.split('')
     const textLetters = localText.split('')

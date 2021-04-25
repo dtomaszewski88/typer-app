@@ -25,6 +25,7 @@ const mapStateToProps = (state: any) => ({
     countDown: getCountDown(state),
     remainingWords: getRemainingWords(state),
 })
+
 const mapDispatchToProps = {
     updateLocalText: updateLocalTextGuarded,
     countDownInit,

@@ -6,6 +6,7 @@ type words = [string?]
 
 enum GameStatus {
     INIT,
+    START,
     GAME_READY,
     GAME_COUNTDOWN,
     GAME_IN_PROGRESS,
@@ -15,7 +16,10 @@ enum GameStatus {
 type GameStatusStrings = keyof typeof GameStatus
 
 interface TyperState {
+    userName: string
     status: GameStatusStrings
+    isSearchingForGame: boolean
+    isWaitingForPlayers: boolean
     isStarted: boolean
     isDone: boolean
     countDown: number
@@ -32,13 +36,17 @@ interface TyperState {
 }
 
 export const INIT = 'INIT'
+export const START = 'START'
 export const GAME_READY = 'GAME_READY'
 export const GAME_COUNTDOWN = 'GAME_COUNTDOWN'
 export const GAME_IN_PROGRESS = 'GAME_IN_PROGRESS'
 export const GAME_OVER = 'GAME_OVER'
 
 const initialState: TyperState = {
+    userName: '',
     status: INIT,
+    isSearchingForGame: false,
+    isWaitingForPlayers: false,
     isStarted: false,
     isDone: false,
     countDown: 0,
@@ -76,8 +84,12 @@ export const typerSlice = createSlice({
     name: 'counter',
     initialState,
     reducers: {
+        updateUserName: (state, action: PayloadAction<string>) => {
+            state.userName = action.payload
+        },
         countDownInit: (state, action: PayloadAction<number>) => {
             state.status = GAME_COUNTDOWN
+            state.isWaitingForPlayers = false
             state.countDown = action.payload
             state.currentWordIndex = 0
             state.isDone = false
@@ -93,7 +105,7 @@ export const typerSlice = createSlice({
             state.startTime = Date.now()
         },
         fetchWordsSuccess: (state, action: PayloadAction<words>) => {
-            state.status = GAME_READY
+            state.status = START
             state.words = action.payload
         },
         invalidInput: (state, action: PayloadAction<number>) => {
@@ -119,11 +131,21 @@ export const typerSlice = createSlice({
             state.errorTime = 0
             popWord(state)
         },
-        gameReady: () => {},
+        gameSearchInit: (state) => {
+            state.isSearchingForGame = true
+        },
+        gameSearchSuccess: (state) => {
+            state.isSearchingForGame = false
+            state.status = GAME_READY
+        },
+        playerReadyInit: (state) => {
+            state.isWaitingForPlayers = true
+        },
     },
 })
 
 export const {
+    updateUserName,
     updateLocalText,
     updateRemoteText,
     fetchWordsSuccess,
@@ -132,14 +154,21 @@ export const {
     countDownInit,
     countDownTick,
     countDownDone,
+    gameSearchInit,
+    gameSearchSuccess,
+    playerReadyInit,
 } = typerSlice.actions
 
+export const getUserName = (state: RootState) => state.typer.userName
 export const getStatus = (state: RootState) => state.typer.status
 export const getWords = (state: RootState) => state.typer.words
-// export const getRemainingWords = (state: RootState) => state.typer.words
 export const getErrors = (state: RootState) => state.typer.errors
 export const getErrorTime = (state: RootState) => state.typer.errorTime
 export const getIsStarted = (state: RootState) => state.typer.isStarted
+export const getIsSearchingForGame = (state: RootState) =>
+    state.typer.isSearchingForGame
+export const getIsWaitingForPlayers = (state: RootState) =>
+    state.typer.isWaitingForPlayers
 export const getLocalText = (state: RootState) => state.typer.localText
 export const getRemoteText = (state: RootState) => state.typer.remoteText
 export const getCurrentWordIndex = (state: RootState) =>

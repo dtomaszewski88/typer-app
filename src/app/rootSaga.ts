@@ -22,6 +22,9 @@ import {
     getCountDown,
     countDownTick,
     countDownDone,
+    gameSearchInit,
+    gameSearchSuccess,
+    playerReadyInit,
 } from '../features/typer/typerSlice'
 
 const fetchWordsRequest = async () => {
@@ -57,16 +60,16 @@ function* onSocketReadUpdate(action: ReturnType<typeof updateRemoteText>) {
 }
 
 function* countDown(action: ReturnType<typeof countDownInit>) {
-    // while (true) {
-    //   yield delay(1000)
-    //   const count: number = yield select(getCountDown)
-    //   if (count === 0) {
-    //     yield put(countDownDone())
-    //     return;
-    //   } else {
-    //     yield put(countDownTick())
-    //   }
-    // }
+    while (true) {
+        yield delay(1000)
+        const count: number = yield select(getCountDown)
+        if (count === 0) {
+            yield put(countDownDone())
+            return
+        } else {
+            yield put(countDownTick())
+        }
+    }
 }
 
 function* watchCountDown() {
@@ -75,7 +78,26 @@ function* watchCountDown() {
 
 function* loadWords() {
     const data: [string?] = yield call(fetchWordsRequest)
+    // yield delay(5000)
     yield put(fetchWordsSuccess(data))
+}
+
+function* handleGameSearch() {
+    yield delay(1000)
+    yield put(gameSearchSuccess())
+}
+
+function* watchGameSearchInit() {
+    yield takeLatest(gameSearchInit, handleGameSearch)
+}
+
+function* handlePlayerReady() {
+    yield delay(1000)
+    yield put(countDownInit(5))
+}
+
+function* watchPlayerReadyInit() {
+    yield takeLatest(playerReadyInit, handlePlayerReady)
 }
 
 function* read(socket: Socket) {
@@ -115,6 +137,8 @@ function* initAppSaga() {
 export default function* rootSaga() {
     yield all([
         initAppSaga(),
+        watchGameSearchInit(),
+        watchPlayerReadyInit(),
         watchUpdateLocalText(),
         watchLocationChange(),
         watchCountDown(),
