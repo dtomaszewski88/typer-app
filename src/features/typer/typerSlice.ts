@@ -1,8 +1,7 @@
 import { createSelector, createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { slice } from 'lodash'
 import { AppThunk, RootState } from '../../app/store'
-
-type words = [string?]
+import _ from 'lodash'
 
 enum GameStatus {
     INIT,
@@ -14,18 +13,23 @@ enum GameStatus {
 }
 
 type GameStatusStrings = keyof typeof GameStatus
-
+type Game = {
+    id: string
+    words: [string]
+    players: {
+        [key: string]: { id: string; isReady: boolean; currentText: string }
+    }
+}
 interface TyperState {
     userName: string
+    playerId: string
     status: GameStatusStrings
+    game: Game | null
     isSearchingForGame: boolean
     isWaitingForPlayers: boolean
-    isStarted: boolean
-    isDone: boolean
     countDown: number
     errors: number
     score: number
-    words: words
     currentWord: string
     currentWordIndex: number
     localText: string
@@ -44,15 +48,14 @@ export const GAME_OVER = 'GAME_OVER'
 
 const initialState: TyperState = {
     userName: '',
+    playerId: '',
+    game: null,
     status: INIT,
     isSearchingForGame: false,
     isWaitingForPlayers: false,
-    isStarted: false,
-    isDone: false,
     countDown: 0,
     errors: 0,
     score: 0,
-    words: [],
     currentWord: '',
     currentWordIndex: 0,
     localText: '',
@@ -65,10 +68,9 @@ const initialState: TyperState = {
 const popWord = (state: TyperState) => {
     state.currentWordIndex++
     state.startTime = Date.now()
-    if (state.words.length === state.currentWordIndex) {
+    if (state.game.words.length === state.currentWordIndex) {
         state.status = GAME_OVER
     }
-    state.isDone = state.words.length === state.currentWordIndex
 }
 
 const calcScore = (word: string, time: number, errors: number) => {
@@ -81,9 +83,13 @@ const calcScore = (word: string, time: number, errors: number) => {
 }
 
 export const typerSlice = createSlice({
-    name: 'counter',
+    name: 'typer',
     initialState,
     reducers: {
+        initAppSuccess: (state, action: PayloadAction<string>) => {
+            state.playerId = action.payload
+            state.status = START
+        },
         updateUserName: (state, action: PayloadAction<string>) => {
             state.userName = action.payload
         },
@@ -92,8 +98,6 @@ export const typerSlice = createSlice({
             state.isWaitingForPlayers = false
             state.countDown = action.payload
             state.currentWordIndex = 0
-            state.isDone = false
-            state.isStarted = false
         },
         countDownTick: (state) => {
             state.countDown--
@@ -101,12 +105,7 @@ export const typerSlice = createSlice({
         countDownDone: (state) => {
             state.status = GAME_IN_PROGRESS
             state.countDown = 0
-            state.isStarted = true
             state.startTime = Date.now()
-        },
-        fetchWordsSuccess: (state, action: PayloadAction<words>) => {
-            state.status = START
-            state.words = action.payload
         },
         invalidInput: (state, action: PayloadAction<number>) => {
             state.errorTime = action.payload
@@ -134,9 +133,13 @@ export const typerSlice = createSlice({
         gameSearchInit: (state) => {
             state.isSearchingForGame = true
         },
-        gameSearchSuccess: (state) => {
+        gameSearchSuccess: (state, action: PayloadAction<Game>) => {
             state.isSearchingForGame = false
             state.status = GAME_READY
+            state.game = action.payload
+        },
+        gameUpdate: (state, action: PayloadAction<Game>) => {
+            state.game = action.payload
         },
         playerReadyInit: (state) => {
             state.isWaitingForPlayers = true
@@ -145,26 +148,33 @@ export const typerSlice = createSlice({
 })
 
 export const {
+    initAppSuccess,
     updateUserName,
     updateLocalText,
     updateRemoteText,
-    fetchWordsSuccess,
     completeWord,
     invalidInput,
     countDownInit,
     countDownTick,
     countDownDone,
+    gameUpdate,
     gameSearchInit,
     gameSearchSuccess,
     playerReadyInit,
 } = typerSlice.actions
 
+export const getTyperState = (state: RootState) => state.typer
 export const getUserName = (state: RootState) => state.typer.userName
+export const getPlayerId = (state: RootState) => state.typer.playerId
 export const getStatus = (state: RootState) => state.typer.status
-export const getWords = (state: RootState) => state.typer.words
+export const getWords = (state: RootState) => state.typer.game?.words || []
+export const getGameId = (state: RootState) => state.typer.game?.id || ''
+export const getGamePlayers = (state: RootState) =>
+    state.typer.game?.players || {}
 export const getErrors = (state: RootState) => state.typer.errors
 export const getErrorTime = (state: RootState) => state.typer.errorTime
-export const getIsStarted = (state: RootState) => state.typer.isStarted
+export const getIsStarted = (state: RootState) =>
+    getStatus(state) === GAME_IN_PROGRESS
 export const getIsSearchingForGame = (state: RootState) =>
     state.typer.isSearchingForGame
 export const getIsWaitingForPlayers = (state: RootState) =>
@@ -175,22 +185,32 @@ export const getCurrentWordIndex = (state: RootState) =>
     state.typer.currentWordIndex
 export const getScore = (state: RootState) => state.typer.score
 export const getCountDown = (state: RootState) => state.typer.countDown
+
 export const getRemainingWords = createSelector(
     getWords,
     getCurrentWordIndex,
     (words, wordIndex) => slice(words, wordIndex + 1, wordIndex + 10)
 )
 export const getCurrentWord = createSelector(
-    getIsStarted,
     getWords,
     getCurrentWordIndex,
-    (isStarted, words, wordIndex) => {
-        console.log('getCurrentWord', isStarted, words, wordIndex)
-        if (!isStarted) {
-            return ''
-        }
-        return words[wordIndex] || ''
-    }
+    (words, wordIndex) => words[wordIndex] || ''
+)
+
+export const getPlayersCurrentWords = createSelector(
+    getPlayerId,
+    getWords,
+    getGamePlayers,
+    (playerId, words, players) =>
+        _.chain(players)
+            .tap(console.log)
+            .omit(playerId)
+            .mapValues((player) => ({
+                ...player,
+                currentWordProgress: player.currentText.length,
+                currentWord: words[player.currentWordIndex],
+            }))
+            .value()
 )
 
 export const updateLocalTextGuarded = (value: string): AppThunk => (
@@ -223,8 +243,6 @@ export const updateWithKey = (key: string): AppThunk => (
     }
 
     const newVal = localText + key
-    console.log('currentWord', currentWord)
-    console.log('localText', localText)
     if (!currentWord.startsWith(newVal)) {
         dispatch(invalidInput(Date.now()))
         return

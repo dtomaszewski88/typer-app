@@ -24,16 +24,12 @@ interface Props {
 }
 
 export default function App(props: Props) {
-    const { updateText, countDownInit, status } = props
+    const { updateText, status } = props
     return (
         <>
             <KeyboardEventHandler
-                handleKeys={['enter']}
-                onKeyEvent={() => countDownInit(3)}
-            />
-            <KeyboardEventHandler
                 handleKeys={['alphabetic']}
-                onKeyEvent={(key, event) => updateText(key)}
+                onKeyEvent={(key) => updateText(key)}
             />
             <Navbar>
                 <TyperDebug />

@@ -12,6 +12,7 @@ interface Props {
     localText: string
     currentWord: string | undefined
     remainingWords: [string?]
+    playerCurrentWords: Object
 }
 
 const Typer = ({
@@ -19,9 +20,12 @@ const Typer = ({
     localText,
     currentWord,
     remainingWords,
+    playerCurrentWords,
 }: Props) => {
     const promptLetters = currentWord.split('')
     const textLetters = localText.split('')
+    const playersWordProgress = playerCurrentWords
+    console.log('playerCurrentWords', playerCurrentWords)
     const wordWrapper = (
         <div className="word-wrapper-inner">
             <div className="prompt-wrapper">
@@ -32,7 +36,19 @@ const Typer = ({
                         })}
                         key={`${letter}-${index}`}
                     >
-                        {letter}
+                        <span>{letter}</span>
+                        <div className="progress-wrap">
+                            {map(playersWordProgress, (progress, playerId) => {
+                                if (progress.currentWordProgress === index) {
+                                    return (
+                                        <div
+                                            className="progress-bar"
+                                            key={playerId}
+                                        ></div>
+                                    )
+                                }
+                            })}
+                        </div>
                     </div>
                 ))}
             </div>
@@ -47,6 +63,7 @@ const Typer = ({
     )
     const translates = [1.25, 4, 6, 8, 10, 13]
     const scales = [2.5, 1.8, 1.3, 1, 0.8, 0]
+
     return (
         <>
             <Container>
