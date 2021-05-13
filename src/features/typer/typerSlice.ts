@@ -68,9 +68,9 @@ const initialState: TyperState = {
 const popWord = (state: TyperState) => {
     state.currentWordIndex++
     state.startTime = Date.now()
-    if (state.game.words.length === state.currentWordIndex) {
-        state.status = GAME_OVER
-    }
+    // if (state.game.words.length === state.currentWordIndex) {
+    //     state.status = GAME_OVER
+    // }
 }
 
 const calcScore = (word: string, time: number, errors: number) => {
@@ -114,6 +114,7 @@ export const typerSlice = createSlice({
         updateLocalText: (state, action: PayloadAction<string>) => {
             state.errorTime = 0
             state.localText = action.payload
+            state.game.players[state.playerId].currentText = action.payload
         },
         updateRemoteText: (state, action: PayloadAction<string>) => {
             state.remoteText = action.payload
@@ -124,11 +125,14 @@ export const typerSlice = createSlice({
         ) => {
             const { word, time } = action.payload
             const timeDiff = time - state.startTime
+            const playerId = state.playerId
+            state.game.players[playerId].currentText = ''
             state.score += calcScore(word, timeDiff, state.errors)
             state.localText = ''
             state.errors = 0
             state.errorTime = 0
-            popWord(state)
+            state.currentWordIndex++
+            state.startTime = Date.now()
         },
         gameSearchInit: (state) => {
             state.isSearchingForGame = true
@@ -140,6 +144,10 @@ export const typerSlice = createSlice({
         },
         gameUpdate: (state, action: PayloadAction<Game>) => {
             state.game = action.payload
+        },
+        gameOver: (state, action: PayloadAction<Game>) => {
+            state.game = action.payload
+            state.status = GAME_OVER
         },
         playerReadyInit: (state) => {
             state.isWaitingForPlayers = true
@@ -158,6 +166,7 @@ export const {
     countDownTick,
     countDownDone,
     gameUpdate,
+    gameOver,
     gameSearchInit,
     gameSearchSuccess,
     playerReadyInit,
@@ -167,10 +176,11 @@ export const getTyperState = (state: RootState) => state.typer
 export const getUserName = (state: RootState) => state.typer.userName
 export const getPlayerId = (state: RootState) => state.typer.playerId
 export const getStatus = (state: RootState) => state.typer.status
-export const getWords = (state: RootState) => state.typer.game?.words || []
-export const getGameId = (state: RootState) => state.typer.game?.id || ''
+export const getGameState = (state: RootState) => state.typer.game
+export const getWords = (state: RootState) => getGameState(state)?.words || []
+export const getGameId = (state: RootState) => getGameState(state)?.id || ''
 export const getGamePlayers = (state: RootState) =>
-    state.typer.game?.players || {}
+    getGameState(state)?.players || {}
 export const getErrors = (state: RootState) => state.typer.errors
 export const getErrorTime = (state: RootState) => state.typer.errorTime
 export const getIsStarted = (state: RootState) =>
@@ -179,7 +189,7 @@ export const getIsSearchingForGame = (state: RootState) =>
     state.typer.isSearchingForGame
 export const getIsWaitingForPlayers = (state: RootState) =>
     state.typer.isWaitingForPlayers
-export const getLocalText = (state: RootState) => state.typer.localText
+// export const getLocalText = (state: RootState) => state.typer.localText
 export const getRemoteText = (state: RootState) => state.typer.remoteText
 export const getCurrentWordIndex = (state: RootState) =>
     state.typer.currentWordIndex
@@ -195,6 +205,13 @@ export const getCurrentWord = createSelector(
     getWords,
     getCurrentWordIndex,
     (words, wordIndex) => words[wordIndex] || ''
+)
+export const getLocalText = createSelector(
+    getPlayerId,
+    getGamePlayers,
+    (playerId, players) => {
+        return players[playerId]?.currentText || ''
+    }
 )
 
 export const getPlayersCurrentWords = createSelector(

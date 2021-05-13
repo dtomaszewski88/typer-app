@@ -9,7 +9,7 @@ import { createBrowserHistory } from 'history'
 import typerReducer from '../features/typer/typerSlice'
 import { connectRouter, routerMiddleware } from 'connected-react-router'
 import createSagaMiddleware from 'redux-saga'
-import rootSaga from './rootSaga'
+import rootSaga from './sagas/rootSaga'
 
 const createRootReducer = (history: any) =>
     combineReducers({

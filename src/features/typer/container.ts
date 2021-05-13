@@ -13,6 +13,7 @@ import {
     getErrorTime,
     getRemainingWords,
     getPlayersCurrentWords,
+    getGameState,
 } from './typerSlice'
 
 const mapStateToProps = (state: any) => ({
@@ -26,6 +27,7 @@ const mapStateToProps = (state: any) => ({
     countDown: getCountDown(state),
     remainingWords: getRemainingWords(state),
     playerCurrentWords: getPlayersCurrentWords(state),
+    gameState: getGameState(state),
 })
 
 const mapDispatchToProps = {

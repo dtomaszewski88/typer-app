@@ -1,0 +1,19 @@
+$base-opacity: 0.45;
+
+.remaining-words {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    position: relative;
+    .remaining-word {
+        position: absolute;
+        top: 0;
+        transition: transform 300ms ease-in;
+        @for $i from 1 through 5 {
+            &:nth-child(#{$i}) {
+                opacity: $base-opacity / (($i + 1) * 0.1);
+            }
+        }
+    }
+}
