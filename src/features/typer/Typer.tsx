@@ -2,7 +2,7 @@ import React from 'react'
 import { Container } from 'react-bootstrap'
 import { CSSTransition } from 'react-transition-group'
 import { map } from 'lodash'
-import Score from '../score/container'
+import ScoreBoard from '../score/container'
 import './typer.scss'
 import WordProgress from './WordPreview'
 import RemainingWords from './remainingWords'
@@ -13,6 +13,7 @@ interface Props {
     currentWord: string | undefined
     remainingWords: [string?]
     playerCurrentWords: Object
+    playersScores: ReadonlyArray<Object>
     gameState: Object
 }
 
@@ -23,15 +24,15 @@ const Typer = ({
     remainingWords,
     playerCurrentWords,
     gameState,
+    playersScores,
 }: Props) => {
     const textLetters = localText.split('')
     console.log('gameState', gameState)
+    console.log('playersScores', playersScores)
     return (
         <>
             <Container>
-                <Score />
-            </Container>
-            <Container>
+                <ScoreBoard />
                 <div className="typer">
                     <div className="current-word-input" key={errorTime}>
                         <CSSTransition

@@ -7,8 +7,9 @@ import {
     gameSearchInit,
     playerReadyInit,
     getGameId,
-    getTyperState,
     completeWord,
+    getErrors,
+    getUserName,
 } from '../../../../features/typer/typerSlice'
 
 function* writeLocalText(socket: Socket) {
@@ -21,20 +22,21 @@ function* writeLocalText(socket: Socket) {
 function* writeCompleteWord(socket: Socket) {
     yield takeEvery([completeWord], function* () {
         const gameId = yield select(getGameId)
-        socket.emit('completeWord', { gameId })
+        const errors = yield select(getErrors)
+        socket.emit('completeWord', { gameId, errors })
     })
 }
 
 function* writeGameSearchInit(socket: Socket) {
-    yield takeEvery([gameSearchInit], () => {
-        socket.emit('gameSearchInit')
+    yield takeEvery([gameSearchInit], function* () {
+        const name = yield select(getUserName)
+        socket.emit('gameSearchInit', { name })
     })
 }
 
 function* writePlayerReadyInit(socket: Socket) {
     yield takeEvery([playerReadyInit], function* () {
         const gameId = yield select(getGameId)
-        const state = yield select(getTyperState)
         socket.emit('playerReadyInit', { gameId: gameId })
     })
 }

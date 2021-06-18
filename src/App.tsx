@@ -3,7 +3,6 @@ import Typer from './features/typer/container'
 import Init from './features/init/init'
 import Start from './features/start/container'
 import GameReady from './features/gameReady/container'
-import TyperDebug from './features/typerDebug/container'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import KeyboardEventHandler from 'react-keyboard-event-handler'
 import Countdown from './features/countdown/container'
@@ -16,6 +15,7 @@ import {
     GAME_OVER,
 } from './features/typer/typerSlice'
 import { Navbar } from 'react-bootstrap'
+import GameOver from './features/gameOver/container'
 
 interface Props {
     updateText: (arg0: string) => void
@@ -31,9 +31,7 @@ export default function App(props: Props) {
                 handleKeys={['alphabetic']}
                 onKeyEvent={(key) => updateText(key)}
             />
-            <Navbar>
-                <TyperDebug />
-            </Navbar>
+            <Navbar></Navbar>
             <div className="app-main">
                 {
                     {
@@ -42,7 +40,7 @@ export default function App(props: Props) {
                         [GAME_READY]: <GameReady />,
                         [GAME_COUNTDOWN]: <Countdown />,
                         [GAME_IN_PROGRESS]: <Typer />,
-                        [GAME_OVER]: <div>{' GAME_OVER '}</div>,
+                        [GAME_OVER]: <GameOver />,
                     }[status]
                 }
             </div>

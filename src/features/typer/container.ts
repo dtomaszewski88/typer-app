@@ -3,7 +3,6 @@ import Typer from './Typer'
 import {
     getLocalText,
     updateLocalTextGuarded,
-    getRemoteText,
     getCurrentWord,
     getScore,
     getCountDown,
@@ -14,11 +13,11 @@ import {
     getRemainingWords,
     getPlayersCurrentWords,
     getGameState,
+    getPlayersScores,
 } from './typerSlice'
 
 const mapStateToProps = (state: any) => ({
     localText: getLocalText(state),
-    remoteText: getRemoteText(state),
     currentWord: getCurrentWord(state),
     errors: getErrors(state),
     status: getStatus(state),
@@ -27,6 +26,7 @@ const mapStateToProps = (state: any) => ({
     countDown: getCountDown(state),
     remainingWords: getRemainingWords(state),
     playerCurrentWords: getPlayersCurrentWords(state),
+    playersScores: getPlayersScores(state),
     gameState: getGameState(state),
 })
 

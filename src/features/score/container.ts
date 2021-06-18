@@ -1,9 +1,10 @@
 import { connect } from 'react-redux'
-import Score from './Score'
-import { getScore } from '../typer/typerSlice'
+import ScoreBoard from './ScoreBoard'
+import { getGameState, getPlayersScores } from '../typer/typerSlice'
 
 const mapStateToProps = (state: any) => ({
-    score: getScore(state),
+    playersScores: getPlayersScores(state),
+    gameState: getGameState(state),
 })
 
-export default connect(mapStateToProps)(Score)
+export default connect(mapStateToProps)(ScoreBoard)

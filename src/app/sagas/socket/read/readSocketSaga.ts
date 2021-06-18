@@ -4,7 +4,6 @@ import { eventChannel } from 'redux-saga'
 import type { Socket } from 'socket.io-client'
 
 import {
-    updateRemoteText,
     countDownInit,
     gameUpdate,
     gameSearchSuccess,
@@ -16,10 +15,10 @@ const COUNTDOWN_STEP_COUNT = 1
 export function* createSocketReadChannel(socket: Socket) {
     return eventChannel((emit) => {
         socket.on('gameOver', (data) => {
-            return emit(gameOver(data))
+            emit(gameOver(data))
         })
         socket.on('gameUpdate', (data) => {
-            return emit(gameUpdate(data))
+            emit(gameUpdate(data))
         })
         socket.on('gameSearchSuccess', (data) => {
             console.log(socket, data)
@@ -28,16 +27,16 @@ export function* createSocketReadChannel(socket: Socket) {
         socket.on('gameReadySuccess', () => {
             emit(countDownInit(COUNTDOWN_STEP_COUNT))
         })
+        socket.on('playerDisconnected', (...args) => {
+            console.log('playerDisconnected', args)
+        })
         return () => {}
     })
 }
 
 export function* readSocket(socket: Socket) {
     const readChannel = yield call(createSocketReadChannel, socket)
-    yield takeEvery(
-        readChannel,
-        function* (action: ReturnType<typeof updateRemoteText>) {
-            yield put(action)
-        }
-    )
+    yield takeEvery(readChannel, function* (action) {
+        yield put(action)
+    })
 }
